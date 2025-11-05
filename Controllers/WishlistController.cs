@@ -6,53 +6,57 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using story_brook_api.Data;
+using story_brook_api.Dtos;
 using story_brook_api.Models;
 
 namespace story_brook_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class WishlistController : ControllerBase
+    public class WishListController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public WishlistController(AppDbContext context)
+        public WishListController(AppDbContext context)
         {
             _context = context;
         }
 
         // GET: api/Wishlist
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Wishlist>>> GetWishlist()
+        [HttpGet("ByUser/{id}")]
+        public async Task<ActionResult<IEnumerable<WishBook>>> GetWishListByUser(string id)
         {
-            return await _context.Wishlist.ToListAsync();
+            return await _context.WishList
+            .Include(w => w.User)
+            .Include(w => w.Book)
+            .Where(w => w.UserId == id).ToListAsync();
         }
 
         // GET: api/Wishlist/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Wishlist>> GetWishlist(string id)
+        public async Task<ActionResult<WishBook>> GetWishList(string id)
         {
-            var wishlist = await _context.Wishlist.FindAsync(id);
+            var wishList = await _context.WishList.FindAsync(id);
 
-            if (wishlist == null)
+            if (wishList == null)
             {
                 return NotFound();
             }
 
-            return wishlist;
+            return wishList;
         }
 
         // PUT: api/Wishlist/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutWishlist(string id, Wishlist wishlist)
+        public async Task<IActionResult> PutWishlist(string id, WishBook wishList)
         {
-            if (id != wishlist.Id)
+            if (id != wishList.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(wishlist).State = EntityState.Modified;
+            _context.Entry(wishList).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +64,7 @@ namespace story_brook_api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!WishlistExists(id))
+                if (!WishListExists(id))
                 {
                     return NotFound();
                 }
@@ -76,16 +80,22 @@ namespace story_brook_api.Controllers
         // POST: api/Wishlist
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Wishlist>> PostWishlist(Wishlist wishlist)
+        public async Task<ActionResult<WishBook>> PostWishlist(WishBookDto wishbookDto)
         {
-            _context.Wishlist.Add(wishlist);
+            WishBook wishBook = new WishBook
+            {
+                Id = Guid.NewGuid().ToString(),
+                User = await _context.Users.FindAsync(wishbookDto.UserId),
+                Book = await _context.Books.FindAsync(wishbookDto.BookId)
+            };
+            _context.WishList.Add(wishBook);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (WishlistExists(wishlist.Id))
+                if (WishListExists(wishBook.Id))
                 {
                     return Conflict();
                 }
@@ -95,28 +105,28 @@ namespace story_brook_api.Controllers
                 }
             }
 
-            return CreatedAtAction("GetWishlist", new { id = wishlist.Id }, wishlist);
+            return CreatedAtAction(nameof(GetWishList), new { id = wishBook.Id }, wishBook);
         }
 
         // DELETE: api/Wishlist/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWishlist(string id)
         {
-            var wishlist = await _context.Wishlist.FindAsync(id);
-            if (wishlist == null)
+            var wishList = await _context.WishList.FindAsync(id);
+            if (wishList == null)
             {
                 return NotFound();
             }
 
-            _context.Wishlist.Remove(wishlist);
+            _context.WishList.Remove(wishList);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool WishlistExists(string id)
+        private bool WishListExists(string id)
         {
-            return _context.Wishlist.Any(e => e.Id == id);
+            return _context.WishList.Any(e => e.Id == id);
         }
     }
 }

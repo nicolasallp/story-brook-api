@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using story_brook_api.Data;
+using story_brook_api.Dtos;
 using story_brook_api.Models;
 
 namespace story_brook_api.Controllers
@@ -76,8 +77,15 @@ namespace story_brook_api.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<User>> PostUser(UserDto userDto)
         {
+            User user = new User
+            {
+                UserId = Guid.NewGuid().ToString(),
+                Username = userDto.Username,
+                Email = userDto.Email,
+                Password = userDto.Password
+            };
             _context.Users.Add(user);
             try
             {
