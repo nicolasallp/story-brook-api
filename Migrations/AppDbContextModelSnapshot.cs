@@ -23,12 +23,12 @@ namespace story_brook_api.Migrations
 
             modelBuilder.Entity("story_brook_api.Models.Book", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("BookId")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("id");
 
-                    b.HasKey("Id");
+                    b.HasKey("BookId");
 
                     b.ToTable("Books");
                 });
@@ -48,33 +48,50 @@ namespace story_brook_api.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("password");
 
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("username");
+
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("story_brook_api.Models.Wishlist", b =>
+            modelBuilder.Entity("story_brook_api.Models.WishBook", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(36)
                         .HasColumnType("nvarchar(36)")
                         .HasColumnName("id");
 
+                    b.Property<string>("BookId")
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("book_id");
+
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(36)");
+                        .HasColumnType("nvarchar(36)")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BookId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Wishlist");
+                    b.ToTable("WishList");
                 });
 
-            modelBuilder.Entity("story_brook_api.Models.Wishlist", b =>
+            modelBuilder.Entity("story_brook_api.Models.WishBook", b =>
                 {
+                    b.HasOne("story_brook_api.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId");
+
                     b.HasOne("story_brook_api.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Book");
 
                     b.Navigation("User");
                 });
