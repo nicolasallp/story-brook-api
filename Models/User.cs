@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace story_brook_api.Models
@@ -9,6 +10,9 @@ namespace story_brook_api.Models
         [Column("id")]
         [MaxLength(36)]
         public string? UserId { get; set; }
+
+        [Column("username")]
+        public string? Username { get; set; }
 
         [Column("email")]
         public string? Email { get; set; }

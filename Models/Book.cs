@@ -8,6 +8,6 @@ namespace story_brook_api.Models
         [Key]
         [Column("id")]
         [MaxLength(20)]
-        public string? Id { get; set; }
+        public string? BookId { get; set; }
     }
 }
