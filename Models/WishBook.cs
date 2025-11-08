@@ -19,8 +19,5 @@ namespace story_brook_api.Models
 
         [ForeignKey("UserId")]
         public User? User { get; set; }
-
-        [ForeignKey("BookId")]
-        public Book? Book { get; set; }
     }
 }
